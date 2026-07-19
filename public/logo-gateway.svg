@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Hexagonal gateway ring -->
+  <polygon points="64,12 112,40 112,88 64,116 16,88 16,40"
+           fill="none" stroke="url(#g1)" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- Inner gateway arch -->
+  <path d="M40 64 C40 40, 88 40, 88 64 L88 80 L40 80 Z"
+        fill="url(#g2)" opacity="0.85"/>
+
+  <!-- Center "A" letterform -->
+  <text x="64" y="72" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif"
+        font-size="32" font-weight="700" fill="white" letter-spacing="-1">A</text>
+
+  <!-- Bottom accent line -->
+  <line x1="48" y1="86" x2="80" y2="86" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+</svg>

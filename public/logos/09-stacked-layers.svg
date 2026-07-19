@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient>
+  </defs>
+  <rect x="22" y="16" width="84" height="96" rx="12" fill="url(#g)" opacity="0.9"/>
+  <rect x="30" y="26" width="68" height="16" rx="3" fill="white" opacity="0.2"/>
+  <rect x="30" y="48" width="68" height="16" rx="3" fill="white" opacity="0.2"/>
+  <rect x="30" y="70" width="48" height="16" rx="3" fill="white" opacity="0.2"/>
+  <rect x="30" y="92" width="36" height="12" rx="3" fill="white" opacity="0.15"/>
+  <text x="64" y="66" text-anchor="middle" font-family="system-ui" font-size="22" font-weight="800" fill="white" opacity="0.9">API</text>
+</svg>

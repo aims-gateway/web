@@ -1,0 +1,60 @@
+# AIMS v2 — Next.js 14 production image (standalone output)
+#
+# IMPORTANT: NEXT_PUBLIC_* variables are inlined into the browser bundle at
+# BUILD time (during `next build`), NOT read at runtime. They MUST be passed as
+# --build-arg / compose build.args here. Setting them only under a runtime
+# `environment:` block has NO effect on the shipped JS — that is exactly the
+# login bug (bundle baked an unreachable host). See docker-compose.prod.yml.
+#
+# Build is driven by docker-compose.prod.yml (build.context: ./web).
+
+# ── deps: install from lockfile ─────────────────────────────────────────────
+FROM node:20-alpine AS deps
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# ── builder: compile the standalone server ──────────────────────────────────
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Public config baked into the browser bundle — pass real values via build.args.
+ARG NEXT_PUBLIC_API_BASE
+ARG NEXT_PUBLIC_SITE_URL
+ARG NEXT_PUBLIC_WC_PROJECT_ID
+ARG NEXT_PUBLIC_ADMIN_WALLET
+ARG NEXT_PUBLIC_OKX_AFFILIATE_URL
+ARG NEXT_PUBLIC_GITHUB_USERNAME
+ARG AIMS_BACKEND_ORIGIN
+ENV NEXT_PUBLIC_API_BASE=$NEXT_PUBLIC_API_BASE \
+    NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL \
+    NEXT_PUBLIC_WC_PROJECT_ID=$NEXT_PUBLIC_WC_PROJECT_ID \
+    NEXT_PUBLIC_ADMIN_WALLET=$NEXT_PUBLIC_ADMIN_WALLET \
+    NEXT_PUBLIC_OKX_AFFILIATE_URL=$NEXT_PUBLIC_OKX_AFFILIATE_URL \
+    NEXT_PUBLIC_GITHUB_USERNAME=$NEXT_PUBLIC_GITHUB_USERNAME \
+    AIMS_BACKEND_ORIGIN=$AIMS_BACKEND_ORIGIN \
+    NEXT_TELEMETRY_DISABLED=1
+
+RUN npm run build
+
+# ── runner: minimal standalone runtime ──────────────────────────────────────
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production \
+    NEXT_TELEMETRY_DISABLED=1 \
+    PORT=3000 \
+    HOSTNAME=0.0.0.0
+
+# next.config.js `output: "standalone"` emits a self-contained server bundle.
+# Static assets and the standalone tree are copied separately per Next docs.
+# Locale JSON is bundled into the server chunks by webpack (require-context on
+# the `../messages/${locale}.json` dynamic import), so no messages/ copy needed.
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+
+# node:20-alpine ships a `node` user at uid/gid 1000 (matches compose user:).
+USER 1000:1000
+EXPOSE 3000
+CMD ["node", "server.js"]
